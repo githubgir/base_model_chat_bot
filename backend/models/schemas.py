@@ -28,6 +28,8 @@ class SchemaParseRequest(BaseModel):
         model_definition: String representation of the Pydantic BaseModel
         model_name: Name of the model being parsed
     """
+    model_config = {"protected_namespaces": ()}
+    
     model_definition: str = Field(..., description="Pydantic BaseModel definition as string")
     model_name: str = Field(..., description="Name of the model")
     
@@ -54,12 +56,14 @@ class SchemaParseResponse(BaseModel):
     
     Args:
         model_name: Name of the parsed model
-        schema: Parsed schema information in UI-friendly format
+        schema_data: Parsed schema information in UI-friendly format
         success: Whether the parsing was successful
         error_message: Error message if parsing failed
     """
+    model_config = {"protected_namespaces": ()}
+    
     model_name: str = Field(..., description="Name of the parsed model")
-    schema: Dict[str, Any] = Field(..., description="Parsed schema information")
+    schema_data: Dict[str, Any] = Field(..., description="Parsed schema information")
     success: bool = Field(True, description="Whether parsing was successful")
     error_message: Optional[str] = Field(None, description="Error message if parsing failed")
 

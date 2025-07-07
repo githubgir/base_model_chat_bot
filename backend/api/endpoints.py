@@ -81,7 +81,7 @@ async def parse_schema(
         
         return SchemaParseResponse(
             model_name=request.model_name,
-            schema=parsed_schema,
+            schema_data=parsed_schema,
             success=True
         )
         

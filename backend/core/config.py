@@ -5,7 +5,8 @@ This module handles all configuration settings using Pydantic BaseSettings
 for environment variable management and validation.
 """
 
-from pydantic import BaseSettings, Field
+from pydantic import Field
+from pydantic_settings import BaseSettings
 from typing import List, Optional
 import os
 from dotenv import load_dotenv
@@ -32,9 +33,9 @@ class Settings(BaseSettings):
     PORT: int = Field(default=8000, description="Server port")
     
     # CORS settings
-    ALLOWED_ORIGINS: List[str] = Field(
-        default=["http://localhost:3000", "http://localhost:19006"],
-        description="Allowed CORS origins"
+    ALLOWED_ORIGINS: str = Field(
+        default="http://localhost:3000,http://localhost:19006",
+        description="Comma-separated list of allowed CORS origins"
     )
     
     # OpenAI settings
@@ -61,6 +62,11 @@ class Settings(BaseSettings):
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = True
+    
+    @property
+    def allowed_origins_list(self) -> List[str]:
+        """Convert comma-separated ALLOWED_ORIGINS to list."""
+        return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",")]
 
 
 # Global settings instance
