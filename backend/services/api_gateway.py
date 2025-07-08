@@ -20,16 +20,18 @@ from models.schemas import HTTPMethod
 logger = logging.getLogger(__name__)
 
 
-class APIResponse(BaseModel):
+class APIGatewayResponse(BaseModel):
     """
     Response from external API call.
     
     Args:
+        success: Whether the request was successful
         status_code: HTTP status code
         data: Response data
         headers: Response headers
         execution_time: Time taken for the request in seconds
     """
+    success: bool
     status_code: int
     data: Optional[Union[Dict[str, Any], List[Any], str]]
     headers: Dict[str, str]
@@ -59,7 +61,7 @@ class APIGatewayService:
         data: Dict[str, Any],
         headers: Optional[Dict[str, str]] = None,
         timeout: int = 30
-    ) -> APIResponse:
+    ) -> APIGatewayResponse:
         """
         Forward request to external API.
         
@@ -175,7 +177,7 @@ class APIGatewayService:
         self,
         response: httpx.Response,
         execution_time: float
-    ) -> APIResponse:
+    ) -> APIGatewayResponse:
         """
         Process HTTP response into APIResponse.
         
@@ -192,7 +194,8 @@ class APIGatewayService:
         # Parse response data
         response_data = await self._parse_response_data(response)
         
-        return APIResponse(
+        return APIGatewayResponse(
+            success=200 <= response.status_code < 300,
             status_code=response.status_code,
             data=response_data,
             headers=response_headers,

@@ -22,7 +22,7 @@ from models.schemas import ConversationMessage
 logger = logging.getLogger(__name__)
 
 
-class ChatResult(BaseModel):
+class ChatResponse(BaseModel):
     """
     Result from OpenAI chat processing.
     
@@ -68,7 +68,7 @@ class OpenAIService:
         target_schema: Dict[str, Any],
         conversation_history: List[ConversationMessage] = None,
         current_data: Optional[Dict[str, Any]] = None
-    ) -> ChatResult:
+    ) -> ChatResponse:
         """
         Process user message and extract structured data.
         
@@ -79,7 +79,7 @@ class OpenAIService:
             current_data: Partially filled form data
             
         Returns:
-            ChatResult with response and extracted data
+            ChatResponse with response and extracted data
             
         Raises:
             OpenAIServiceError: If OpenAI API call fails
@@ -310,7 +310,7 @@ Fields:
         response: Dict[str, Any],
         target_schema: Dict[str, Any],
         conversation_id: str
-    ) -> ChatResult:
+    ) -> ChatResponse:
         """
         Process OpenAI response into ChatResult.
         
