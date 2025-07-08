@@ -1,5 +1,5 @@
 # Virtual Environments
-venv_linux/
+.venv/
 venv/
 env/
 ENV/

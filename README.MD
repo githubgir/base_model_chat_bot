@@ -35,10 +35,10 @@ A cross-platform chat bot application that dynamically generates UI from Pydanti
 
 1. Create and activate virtual environment:
 ```bash
-python -m venv venv_linux
-source venv_linux/bin/activate  # On Linux/Mac
+python -m venv .venv
+source .venv/bin/activate  # On Linux/Mac
 # or
-venv_linux\Scripts\activate  # On Windows
+.venv\Scripts\activate  # On Windows
 ```
 
 2. Install Python dependencies:
@@ -66,7 +66,7 @@ npm install
 ### Running the Backend
 
 ```bash
-source venv_linux/bin/activate
+source .venv/bin/activate
 uvicorn main:app --reload
 ```
 
@@ -118,7 +118,7 @@ project1/
 
 Run tests using pytest:
 ```bash
-source venv_linux/bin/activate
+source .venv/bin/activate
 pytest tests/
 ```
 
