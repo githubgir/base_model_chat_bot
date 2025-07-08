@@ -6,9 +6,10 @@
  */
 
 import axios from 'axios';
+import ENV from '../config/env';
 
-// Base URL for the API - update this based on your backend deployment
-const API_BASE_URL = 'http://localhost:8000/api/v1';
+// Base URL for the API
+const API_BASE_URL = ENV.API_BASE_URL;
 
 // Create axios instance with default configuration
 const apiClient = axios.create({

@@ -20,6 +20,11 @@ import {
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
+// Import theming system
+import theme from './styles/theme';
+import globalStyles from './styles/globalStyles';
+import { useResponsive, useResponsiveStyles } from './hooks/useResponsive';
+
 // Import our custom components
 import DynamicForm from './components/DynamicForm';
 import ChatInterface from './components/ChatInterface';
@@ -80,6 +85,10 @@ export default function App() {
   const [modalVisible, setModalVisible] = useState(false);
   const [customModel, setCustomModel] = useState('');
   const [modelName, setModelName] = useState('');
+  
+  // Responsive hooks
+  const { isTablet, isDesktop } = useResponsive();
+  const responsiveStyles = useResponsiveStyles();
 
   // Load a sample model on app start
   useEffect(() => {
@@ -153,52 +162,74 @@ export default function App() {
   };
 
   const renderHomeView = () => (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Chat Bot Form Generator</Text>
-        <Text style={styles.subtitle}>
+    <ScrollView style={[globalStyles.container, responsiveStyles.getStyle({
+      mobile: { paddingHorizontal: responsiveStyles.spacing.sm },
+      tablet: { paddingHorizontal: responsiveStyles.spacing.lg },
+      desktop: { paddingHorizontal: responsiveStyles.spacing.xl }
+    })]}>
+      <View style={[styles.header, responsiveStyles.getStyle({
+        mobile: { paddingVertical: responsiveStyles.spacing.lg },
+        tablet: { paddingVertical: responsiveStyles.spacing.xl },
+        desktop: { paddingVertical: responsiveStyles.spacing['2xl'] }
+      })]}>
+        <Text style={[globalStyles.textHeading1, styles.title]}>Chat Bot Form Generator</Text>
+        <Text style={[globalStyles.textBody, styles.subtitle]}>
           Generate dynamic forms from Pydantic models and fill them using natural language
         </Text>
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Sample Models</Text>
+      <View style={[globalStyles.card, responsiveStyles.getStyle({
+        tablet: { marginHorizontal: responsiveStyles.spacing.lg },
+        desktop: { marginHorizontal: responsiveStyles.spacing.xl }
+      })]}>
+        <Text style={[globalStyles.textHeading3, globalStyles.marginBottomMd]}>Sample Models</Text>
         {Object.keys(SAMPLE_MODELS).map((modelKey) => (
           <TouchableOpacity
             key={modelKey}
-            style={styles.modelButton}
+            style={[globalStyles.button, globalStyles.buttonPrimary, globalStyles.marginBottomSm]}
             onPress={() => loadSampleModel(modelKey)}
           >
-            <Text style={styles.modelButtonText}>{modelKey}</Text>
+            <Text style={globalStyles.buttonText}>{modelKey}</Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Custom Model</Text>
+      <View style={[globalStyles.card, responsiveStyles.getStyle({
+        tablet: { marginHorizontal: responsiveStyles.spacing.lg },
+        desktop: { marginHorizontal: responsiveStyles.spacing.xl }
+      })]}>
+        <Text style={[globalStyles.textHeading3, globalStyles.marginBottomMd]}>Custom Model</Text>
         <TouchableOpacity
-          style={styles.customButton}
+          style={[globalStyles.button, globalStyles.buttonSecondary]}
           onPress={() => setModalVisible(true)}
         >
-          <Text style={styles.customButtonText}>Load Custom Pydantic Model</Text>
+          <Text style={globalStyles.buttonTextSecondary}>Load Custom Pydantic Model</Text>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Features</Text>
+      <View style={[globalStyles.card, responsiveStyles.getStyle({
+        tablet: { marginHorizontal: responsiveStyles.spacing.lg },
+        desktop: { marginHorizontal: responsiveStyles.spacing.xl }
+      })]}>
+        <Text style={[globalStyles.textHeading3, globalStyles.marginBottomMd]}>Features</Text>
         <View style={styles.featureList}>
-          <Text style={styles.featureItem}>• Dynamic form generation from Pydantic schemas</Text>
-          <Text style={styles.featureItem}>• Natural language form filling with AI</Text>
-          <Text style={styles.featureItem}>• Support for nested models and enums</Text>
-          <Text style={styles.featureItem}>• External API integration</Text>
-          <Text style={styles.featureItem}>• Real-time validation and error handling</Text>
+          <Text style={[globalStyles.textBody, styles.featureItem]}>• Dynamic form generation from Pydantic schemas</Text>
+          <Text style={[globalStyles.textBody, styles.featureItem]}>• Natural language form filling with AI</Text>
+          <Text style={[globalStyles.textBody, styles.featureItem]}>• Support for nested models and enums</Text>
+          <Text style={[globalStyles.textBody, styles.featureItem]}>• External API integration</Text>
+          <Text style={[globalStyles.textBody, styles.featureItem]}>• Real-time validation and error handling</Text>
+          <Text style={[globalStyles.textBody, styles.featureItem]}>• Voice-to-voice conversation support</Text>
         </View>
       </View>
     </ScrollView>
   );
 
   const renderNavigationBar = () => (
-    <View style={styles.navbar}>
+    <View style={[styles.navbar, responsiveStyles.getStyle({
+      mobile: { paddingVertical: responsiveStyles.spacing.sm },
+      tablet: { paddingVertical: responsiveStyles.spacing.md },
+      desktop: { paddingVertical: responsiveStyles.spacing.lg }
+    })]}>
       <TouchableOpacity
         style={[styles.navButton, currentView === 'home' && styles.activeNavButton]}
         onPress={() => setCurrentView('home')}
@@ -208,29 +239,29 @@ export default function App() {
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={[styles.navButton, currentView === 'form' && styles.activeNavButton]}
+        style={[styles.navButton, currentView === 'form' && styles.activeNavButton, !schema && styles.navButtonDisabled]}
         onPress={() => setCurrentView('form')}
         disabled={!schema}
       >
-        <Text style={[styles.navButtonText, currentView === 'form' && styles.activeNavButtonText]}>
+        <Text style={[styles.navButtonText, currentView === 'form' && styles.activeNavButtonText, !schema && styles.navButtonTextDisabled]}>
           Form
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={[styles.navButton, currentView === 'chat' && styles.activeNavButton]}
+        style={[styles.navButton, currentView === 'chat' && styles.activeNavButton, !schema && styles.navButtonDisabled]}
         onPress={() => setCurrentView('chat')}
         disabled={!schema}
       >
-        <Text style={[styles.navButtonText, currentView === 'chat' && styles.activeNavButtonText]}>
+        <Text style={[styles.navButtonText, currentView === 'chat' && styles.activeNavButtonText, !schema && styles.navButtonTextDisabled]}>
           Chat
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={[styles.navButton, currentView === 'results' && styles.activeNavButton]}
+        style={[styles.navButton, currentView === 'results' && styles.activeNavButton, !apiResults && styles.navButtonDisabled]}
         onPress={() => setCurrentView('results')}
         disabled={!apiResults}
       >
-        <Text style={[styles.navButtonText, currentView === 'results' && styles.activeNavButtonText]}>
+        <Text style={[styles.navButtonText, currentView === 'results' && styles.activeNavButtonText, !apiResults && styles.navButtonTextDisabled]}>
           Results
         </Text>
       </TouchableOpacity>

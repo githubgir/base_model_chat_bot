@@ -20,6 +20,9 @@ import {
   Platform
 } from 'react-native';
 import ApiService from '../services/api';
+import VoiceButton from './VoiceButton';
+import VoiceSettings from './VoiceSettings';
+import VoiceService from '../services/voiceService';
 
 /**
  * Individual message component
@@ -75,6 +78,8 @@ const ChatInterface = ({
   const [conversationId, setConversationId] = useState(null);
   const [followUpQuestions, setFollowUpQuestions] = useState([]);
   const [isComplete, setIsComplete] = useState(false);
+  const [voiceSettingsVisible, setVoiceSettingsVisible] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
   const scrollViewRef = useRef(null);
 
   // Initialize with a welcome message
@@ -139,6 +144,15 @@ const ChatInterface = ({
       setFollowUpQuestions(response.follow_up_questions || []);
       setIsComplete(response.is_complete);
       
+      // Speak the AI response if voice is enabled
+      if (voiceEnabled && response.message) {
+        try {
+          await VoiceService.speak(response.message);
+        } catch (error) {
+          console.error('Failed to speak AI response:', error);
+        }
+      }
+      
       // Update structured data if available
       if (response.structured_data && onDataUpdate) {
         onDataUpdate(response.structured_data);
@@ -171,6 +185,19 @@ const ChatInterface = ({
   const handleFollowUpQuestion = (question) => {
     setInputText(question);
     sendMessage(question);
+  };
+
+  const handleVoiceTranscription = (transcription) => {
+    setInputText(transcription);
+    sendMessage(transcription);
+  };
+
+  const handleVoiceError = (error) => {
+    Alert.alert('Voice Error', error);
+  };
+
+  const handleVoiceSettingsChange = (settings) => {
+    setVoiceEnabled(settings.voiceEnabled);
   };
 
   const clearConversation = () => {
@@ -211,9 +238,17 @@ const ChatInterface = ({
     >
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Chat Assistant</Text>
-        <TouchableOpacity onPress={clearConversation} style={styles.clearButton}>
-          <Text style={styles.clearButtonText}>Clear</Text>
-        </TouchableOpacity>
+        <View style={styles.headerButtons}>
+          <TouchableOpacity 
+            onPress={() => setVoiceSettingsVisible(true)} 
+            style={styles.settingsButton}
+          >
+            <Text style={styles.settingsButtonText}>🎤</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={clearConversation} style={styles.clearButton}>
+            <Text style={styles.clearButtonText}>Clear</Text>
+          </TouchableOpacity>
+        </View>
       </View>
       
       <ScrollView 
@@ -260,6 +295,13 @@ const ChatInterface = ({
           maxLength={1000}
           editable={!isLoading}
         />
+        <VoiceButton
+          onTranscription={handleVoiceTranscription}
+          onError={handleVoiceError}
+          disabled={isLoading}
+          size="medium"
+          style={styles.voiceButton}
+        />
         <TouchableOpacity
           style={[styles.sendButton, (!inputText.trim() || isLoading) && styles.sendButtonDisabled]}
           onPress={handleSend}
@@ -268,6 +310,12 @@ const ChatInterface = ({
           <Text style={styles.sendButtonText}>Send</Text>
         </TouchableOpacity>
       </View>
+      
+      <VoiceSettings
+        visible={voiceSettingsVisible}
+        onClose={() => setVoiceSettingsVisible(false)}
+        onSettingsChange={handleVoiceSettingsChange}
+      />
     </KeyboardAvoidingView>
   );
 };
@@ -290,6 +338,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: '#333',
+  },
+  headerButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  settingsButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: '#007AFF',
+    borderRadius: 6,
+    marginRight: 10,
+  },
+  settingsButtonText: {
+    fontSize: 16,
   },
   clearButton: {
     paddingHorizontal: 15,
@@ -408,6 +470,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     maxHeight: 100,
     backgroundColor: '#fff',
+  },
+  voiceButton: {
+    marginRight: 10,
   },
   sendButton: {
     backgroundColor: '#007AFF',
